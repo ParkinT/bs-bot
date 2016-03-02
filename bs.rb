@@ -6,12 +6,12 @@ require './spew'
   # test with post http://zaphod-136649.nitrousapp.com:3000/ in an app like Postman
   KEYWORDS = ['bs', 'businessspew', 'business-spew']
   SIGLINE = "\n#BusinessSpew"
-  
+
   category = "corporate" #future
 
   post '/' do
   #return if params[:token] != ENV['SLACK_TOKEN']
-    
+
 =begin
     response 'params' include
     - token 0b58VY5DMiAUCqr8FbnxjwRt
@@ -28,11 +28,23 @@ require './spew'
 =end
 
     trigger_word = params[:trigger_word].strip
-    
+    keywords = params[:text].gsub(trigger_word, '').strip
+
+    if (KEYWORDS.collect { |kw| keywords.split.include?(kw) }).include? true
+      puts "keywords:"
+      puts keywords
+      puts "user_id:"
+      puts params[:user_id]
+      puts "channel_id:"
+      puts params[:channel_id]
+      puts "text:"
+      puts params[:text]
+    end
+
     @bs = Spew.new() # 'Spew new' is fun to say!!
     #@bs = Spew.new( {"paragraphs" => 1, "sentences" => 3 } )
     @tweet =  Spew.new({"paragraphs" => 1, "sentences" => 3}).tweet
-    
+
     content_type :json
   {:username => 'bs', :response_type => "in-channel", :text => "#{@bs.complete_spew.join("\n")}#{SIGLINE}" }.to_json
 
