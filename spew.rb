@@ -1,9 +1,9 @@
 class Spew
-  
+
   require 'uri'
   require 'redis'
   require './punctuation'
-  
+
   SPACE = " "
 
   attr_reader :paragraphs, :title, :tweetified, :category
@@ -13,26 +13,25 @@ class Spew
     # testing: uri = URI.parse('URL_FROM_HEROKU_DASHBOARD')
     @redis = Redis.new(:host => uri.host, :port => uri.port, :password => uri.password)
 
-    defaults = {"paragraphs" => 1, "sentences" => 3, "category" => 'corporate'}
-    params = defaults.merge(params)
     @category = params.fetch("category", "corporate")
-    @title ||= params["title"]
-    repeat_count = params["paragraphs"].to_i if params["paragraphs"]
-    num_sentences = params["sentences"].to_i unless params["sentences"].nil?
+    @title ||= params[:title]
+    repeat_count = params.fetch(:paragraphs, 1).to_i
+    num_sentences = params.fetch(:sentences, 1).to_i
     @paragraphs = Array.new
     (1..repeat_count).each do |r|
       sentences = Array.new
       (1..num_sentences).each do
         sentences.push smart_punctuation(generate_sentence)
       end
-      @paragraphs.push sentences.join(SPACE * 2)
+      @paragraphs.push sentences.join("\n")
     end
+    @paragraphs
   end
 
   def complete_spew
     @paragraphs
   end
-  
+
   def tweet
 	sentence_length = 140
 	while sentence_length > (140 - "\n#BusinessSpew".length)
@@ -45,7 +44,7 @@ class Spew
 private
   def generate_sentence
     category ||= 'corporate'
-    
+
     max = Hash.new()
     max[:prefixes] = (@redis.get "#{category}:prefixes:counter").to_i
     max[:verbs] = (@redis.get "#{category}:verbs:counter").to_i

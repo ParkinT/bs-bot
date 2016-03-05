@@ -28,3 +28,8 @@ In [Slack](https://slack.com/) you simply type `bs` and will get a response like
 
 ![Business Spew](bs_response.png?raw=true)
 
+
+#### Update March 2016
+
+You can now ask BusinessSpew to provide a custom set of paragraphs, each with a custom number of sentences of BS.
+Simply call 'bs-bot' like this: `bs sentences 4 paragraphs 2` to specify your preferences.
